@@ -1,0 +1,708 @@
+{
+  "datasets": [
+    {
+      "name": "21a7edcb",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `workspace`;\n",
+        "USE SCHEMA `default`;\n",
+        "\n",
+        "Select transaction_date, \n",
+        "       DAYNAME(transaction_date) AS Day_name,\n",
+        "       Monthname(transaction_date) AS Month_name,\n",
+        "       Dayofmonth(transaction_date) AS Day_of_month, \n",
+        "\n",
+        "       CASE \n",
+        "           ---When Day_name IN ('Sun','Sat') THEN 'Weekend'\n",
+        "           When Dayname(transaction_date) IN ('Sun','Sat') THEN 'Weekend'\n",
+        "           ELSE 'Weekday'\n",
+        "       END AS Day_Classification,\n",
+        "\n",
+        "       ---date_format(transaction_time, 'HH:mm:ss') AS Purchase_time, \n",
+        "       CASE\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '00:00:00' AND '11:59:59' THEN 'Morning'\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '12:00:00' AND '16:59:59' THEN 'Afternoon'\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '17:00:00' AND '22:00:00' Then 'Evenning'\n",
+        "       END AS Time_buckets, \n",
+        "\n",
+        "---ID Counting \n",
+        "       Count(Distinct transaction_id) AS Number_of_sales,\n",
+        "       Count(Distinct product_id) AS Number_of_products,\n",
+        "       Count(Distinct store_id) AS Number_of_stores,\n",
+        "\n",
+        "---Calculating Revenue\n",
+        "       Sum(transaction_qty*unit_price) AS Revenue_per_day,\n",
+        "\n",
+        "       CASE\n",
+        "           When Revenue_per_day <= 100 THEN '01. Low Spend'\n",
+        "           When Revenue_per_day Between 51 and 100 THEN '02. Medium Spend'\n",
+        "           ELSE '03 High Speed'\n",
+        "       END AS Spend_Buckets, \n",
+        " \n",
+        "---Categories\n",
+        "       store_location,\n",
+        "       product_category,\n",
+        "       product_detail\n",
+        "\n",
+        "\n",
+        "From `workspace`.`default`.`1773680391797_bright_coffee_shop_analysis_case_study_1`\n",
+        "Group by transaction_date,\n",
+        "        DAYNAME(transaction_date),\n",
+        "        Monthname(transaction_date),\n",
+        "        Dayofmonth(transaction_date),\n",
+        "        CASE \n",
+        "           When Dayname(transaction_date) IN ('Sun','Sat') THEN 'Weekend'\n",
+        "           ELSE 'Weekday'\n",
+        "         END,\n",
+        "         CASE\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '00:00:00' AND '11:59:59' THEN 'Morning'\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '12:00:00' AND '16:59:59' THEN 'Afternoon'\n",
+        "           When date_format(transaction_time, 'HH:mm:ss') Between '17:00:00' AND '22:00:00' Then 'Evenning'\n",
+        "         END,\n",
+        "          \n",
+        "         store_location,\n",
+        "         product_category,\n",
+        "         product_detail;\n",
+        "         \n",
+        "         --purchase_time,\n",
+        "       "
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "cdf78440",
+      "displayName": "Bright Coffee Sales Dashboard",
+      "layout": [
+        {
+          "widget": {
+            "name": "a4fe058a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "Time_buckets",
+                      "expression": "`Time_buckets`"
+                    },
+                    {
+                      "name": "Day_name",
+                      "expression": "`Day_name`"
+                    },
+                    {
+                      "name": "count(Number_of_sales)",
+                      "expression": "COUNT(`Number_of_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales performance by day and time buckets"
+              },
+              "mark": {
+                "layout": "stack"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Day_name",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(Number_of_sales)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Time_buckets",
+                  "legend": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#574A4A"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "384eb174",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "Month_name",
+                      "expression": "`Month_name`"
+                    },
+                    {
+                      "name": "count(Number_of_sales)",
+                      "expression": "COUNT(`Number_of_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales trend by month ",
+                "showDescription": false
+              },
+              "mark": {
+                "colors": [
+                  "#00A972"
+                ],
+                "layout": "layer"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Month_name",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(Number_of_sales)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#6D5757"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "cf4cc738",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "sum(Number_of_sales)",
+                      "expression": "SUM(`Number_of_sales`)"
+                    },
+                    {
+                      "name": "Time_buckets",
+                      "expression": "`Time_buckets`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "layout": "stack"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Sales performance by time buckets"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(Number_of_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  }
+                },
+                "color": {
+                  "fieldName": "Time_buckets",
+                  "legend": {
+                    "hideTitle": true,
+                    "position": "right"
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#665959"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "ddbbba5b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "Time_buckets",
+                      "expression": "`Time_buckets`"
+                    },
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    },
+                    {
+                      "name": "countdistinct(Number_of_sales)",
+                      "expression": "COUNT(DISTINCT `Number_of_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales performance by Store location"
+              },
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "store_location",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "countdistinct(Number_of_sales)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Time_buckets",
+                  "legend": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#1F1818"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "98659ac1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "Time_buckets",
+                      "expression": "`Time_buckets`"
+                    },
+                    {
+                      "name": "sum(Revenue_per_day)",
+                      "expression": "SUM(`Revenue_per_day`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "headerAlignment": "left",
+                "title": "Revenue per store_location"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Time_buckets",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Revenue_per_day)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#3B2525"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "651e0aa5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    },
+                    {
+                      "name": "Day_Classification",
+                      "expression": "`Day_Classification`"
+                    },
+                    {
+                      "name": "countdistinct(Number_of_sales)",
+                      "expression": "COUNT(DISTINCT `Number_of_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales breakdown by Day classification to store location"
+              },
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Day_Classification",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "countdistinct(Number_of_sales)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "store_location",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#463838"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 13,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "8f6940a1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    },
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "sum(Revenue_per_day)",
+                      "expression": "SUM(`Revenue_per_day`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Revenue made per Product Category and Store location"
+              },
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Revenue_per_day)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "store_location",
+                  "legend": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#6D5858"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 19,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "d57aaab5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "21a7edcb",
+                  "fields": [
+                    {
+                      "name": "Month_name",
+                      "expression": "`Month_name`"
+                    },
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    },
+                    {
+                      "name": "sum(Revenue_per_day)",
+                      "expression": "SUM(`Revenue_per_day`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Revenue made by Store broken down by month"
+              },
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "store_location",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(Revenue_per_day)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Month_name",
+                  "legend": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4B3B3B"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 19,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "4117554d",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block\"><span style=\"font-size: 24px;\">**BRIGHT COFFEE SHOP SALES ANALYSIS DASHBOARD**</span></span>"
+              ]
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "light": "#23CC4C"
+              },
+              "widgetBorderColor": {
+                "light": "#533A3A"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
